@@ -16,7 +16,11 @@ public class TicketStats {
      * an empty Map. Do not change the List supplied by the caller.
      */
     public static Map<String, Integer> countByCategory(List<Ticket> tickets) {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        Map<String, Integer> counts = new HashMap<>();
+        for (Ticket ticket : tickets) {
+            String category = ticket.category();
+            counts.put(category, counts.getOrDefault(category, 0) + 1);
+        }
+        return counts;
     }
 }

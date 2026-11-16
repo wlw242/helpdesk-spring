@@ -21,7 +21,30 @@ public class TicketCsvReader {
      * in the same order as the file.
      */
     public static List<Ticket> read(Path csvPath) throws IOException {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        List<String> lines = Files.readAllLines(csvPath);
+        List<Ticket> tickets = new ArrayList<>();
+
+        // Start at 1 because line 0 is the header.
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.isBlank()) {
+                continue;
+            }
+
+            // -1 keeps a trailing empty field (an unassigned technician).
+            String[] fields = line.split(",", -1);
+            if (fields.length != 5) {
+                throw new IllegalArgumentException(
+                        "Expected 5 fields on line " + (i + 1) + ": " + line);
+            }
+
+            tickets.add(new Ticket(
+                    fields[0].trim(),
+                    fields[1].trim(),
+                    Priority.valueOf(fields[2].trim()),
+                    TicketStatus.valueOf(fields[3].trim()),
+                    fields[4].trim()));
+        }
+        return tickets;
     }
 }

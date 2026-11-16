@@ -16,8 +16,13 @@ public class TicketQueries {
      * order. Do not change the List supplied by the caller.
      */
     public static List<Ticket> openTickets(List<Ticket> tickets) {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        List<Ticket> open = new ArrayList<>();
+        for (Ticket ticket : tickets) {
+            if (ticket.status() == TicketStatus.OPEN) {
+                open.add(ticket);
+            }
+        }
+        return open;
     }
 
     /**
@@ -26,7 +31,13 @@ public class TicketQueries {
      * technician names. Do not change the List supplied by the caller.
      */
     public static Set<String> technicianNames(List<Ticket> tickets) {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        Set<String> names = new HashSet<>();
+        for (Ticket ticket : tickets) {
+            String name = ticket.technician();
+            if (name != null && !name.isBlank()) {
+                names.add(name.trim());
+            }
+        }
+        return names;
     }
 }

@@ -23,7 +23,15 @@ public class TicketReportWriter {
     public static void writeCategorySummary(
             Path outputPath,
             Map<String, Integer> categoryCounts) throws IOException {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        List<String> categories = new ArrayList<>(categoryCounts.keySet());
+        Collections.sort(categories);
+
+        List<String> lines = new ArrayList<>();
+        for (String category : categories) {
+            lines.add(category + ": " + categoryCounts.get(category));
+        }
+
+        // Files.write creates the file, or replaces it if it already exists
+        Files.write(outputPath, lines);
     }
 }

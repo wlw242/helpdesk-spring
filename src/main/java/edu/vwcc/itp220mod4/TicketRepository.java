@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-    /**
+/**
  * The help desk's tickets, stored in the tickets table (see schema.sql).
  * Every method talks to the database through Spring's JdbcClient.
  */
@@ -49,8 +50,10 @@ public class TicketRepository {
      * into the SQL string. Store priority and status by their enum names.
      */
     public void save(Ticket ticket) {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        jdbc.sql("INSERT INTO tickets (id, category, priority, status, technician) VALUES (?, ?, ?, ?, ?)")
+                .params(ticket.id(), ticket.category(), ticket.priority().name(),
+                        ticket.status().name(), ticket.technician())
+                .update();
     }
 
     /**
@@ -58,8 +61,8 @@ public class TicketRepository {
      * Delete every row in the tickets table.
      */
     public void deleteAll() {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        jdbc.sql("DELETE FROM tickets")
+                .update();
     }
 
     /**
@@ -68,8 +71,10 @@ public class TicketRepository {
      * Hint: query(TicketRepository::mapRow), then optional().
      */
     public Optional<Ticket> findById(String id) {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        return jdbc.sql("SELECT * FROM tickets WHERE id = ?")
+                .params(id)
+                .query(TicketRepository::mapRow)
+                .optional();
     }
 
     /**
@@ -78,8 +83,10 @@ public class TicketRepository {
      * a loop; here the database does the filtering and sorting.
      */
     public List<Ticket> findOpen() {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        return jdbc.sql("SELECT * FROM tickets WHERE status = ? ORDER BY id")
+                .params(TicketStatus.OPEN.name())
+                .query(TicketRepository::mapRow)
+                .list();
     }
 
     /**
@@ -88,8 +95,11 @@ public class TicketRepository {
      * Hint: SELECT DISTINCT, and query(String.class) for a one-column result.
      */
     public Set<String> findTechnicianNames() {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        List<String> names = jdbc.sql(
+                "SELECT DISTINCT technician FROM tickets WHERE TRIM(technician) <> ''")
+                .query(String.class)
+                .list();
+        return new LinkedHashSet<>(names);
     }
 
     /**
@@ -98,8 +108,12 @@ public class TicketRepository {
      * with GROUP BY, then copy each result row into the Map.
      */
     public Map<String, Integer> countByCategory() {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        Map<String, Integer> counts = new HashMap<>();
+        RowCallbackHandler copyRow =
+                rs -> counts.put(rs.getString("category"), rs.getInt("total"));
+        jdbc.sql("SELECT category, COUNT(*) AS total FROM tickets GROUP BY category")
+                .query(copyRow);
+        return counts;
     }
 
 }

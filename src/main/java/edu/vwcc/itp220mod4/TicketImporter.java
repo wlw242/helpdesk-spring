@@ -27,7 +27,11 @@ public class TicketImporter {
      */
     @Transactional
     public int importCsv(Path csvPath) throws IOException {
-        // TODO: your code goes here
-        throw new UnsupportedOperationException("TODO");
+        List<Ticket> tickets = TicketCsvReader.read(csvPath);
+        repository.deleteAll();
+        for (Ticket ticket : tickets) {
+            repository.save(ticket);
+        }
+        return tickets.size();
     }
 }
